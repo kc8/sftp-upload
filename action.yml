@@ -4,6 +4,9 @@ inputs:
   host:
     description: 'Server to connet to'
     required: true
+  username:
+    description: 'Username when connecting'
+    required: true
   password:
     description: 'Password'
     required: true
