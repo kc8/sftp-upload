@@ -38897,36 +38897,35 @@ function convertPaths(p) {
     }
 }
 
+const host = core.getInput('host');
+const username = core.getInput('username');
+const password = core.getInput('password');
+const port = core.getInput('port');
+const rawPaths = core.getInput('paths');
+const paths = convertPaths(rawPaths);
 
-try {
-    const host = core.getInput('host');
-    const username = core.getInput('username');
-    const password = core.getInput('password');
-    const port = core.getInput('port');
-    const rawPaths = core.getInput('paths');
-    // TODO seems to fail for some causes but not sure why
-
-    const paths = convertPaths(rawPaths);
-    const sftp = new SftpClient();
-    const connection = {
-        host: host, 
-        port: port, 
-        username: username, 
-        password: password, 
-    };
+const sftp = new SftpClient();
+const connection = {
+    host: host,
+    port: port,
+    username: username,
+    password: password,
+};
+Object.keys(paths).forEach(localFile => {
+    console.log(`Adding local file ${localFile}, to remove ${paths[localFile]}`);
     sftp.connect(connection)
-        .then(() => {
-            Object.keys(paths).forEach(async localFile => { 
-                console.log(localFile, paths[localFile])
-                sftp.fastPut(localFile, paths[localFile], {autoClose: true});
-            });
+        .then(async () => {
+            try {
+                await sftp.put(localFile, paths[localFile], {autoClose: true})
+            }
+            catch (putErr) {
+                console.log("Failed to put file file:", localFile, " due to ", putErr.message);
+            }
         })
-        .then((data) => console.log("received", data))
-        .catch(err => console.log("Failed with error state, this does not mean it failed", err))
+        .then(data=> console.log(`File ${localFile} added`, data ? `Other info ${data}` : ''))
+        .catch(err => console.log("Failed with error state (this may not indicate a failure for all files)", err))
         .finally(() => sftp.end());
-} catch (error) {
-    core.setFailed(error.message);
-}
+});
 
 })();
 
