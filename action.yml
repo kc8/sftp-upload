@@ -7,17 +7,16 @@ inputs:
   password:
     description: 'Password'
     required: true
+  paths:
+    description: 'key value pair of file local and file remove'
+    required: true 
   port:
     description: 'Port if other than default'
     required: false 
     default: 22
-  paths:
-    description: 'key value pair of file local and file remove'
-    required: false 
-    default: {}
 outputs:
   time: # id of output
     description: 'The time we greeted you'
 runs:
   using: 'node16'
-  main: 'index.js'
+  main: 'dist/index.js'
