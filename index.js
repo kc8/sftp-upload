@@ -35,10 +35,12 @@ Object.keys(paths).forEach(localFile => {
                 await sftp.put(localFile, paths[localFile], {autoClose: true})
             }
             catch (putErr) {
-                console.log("Failed to put file file:", localFile, " due to ", putErr.message);
+                const errMsg = `Failed to put file file:", ${localFile} + " due to , ${putErr.message}`;
+                console.log(errMsg);
+                core.setFailed(errMsg);
             }
         })
         .then(data=> console.log(`File ${localFile} added`, data ? `Other info ${data}` : ''))
-        .catch(err => console.log("Failed with error state (this may not indicate a failure for all files)", err))
+        .catch(err => core.setFailed("Failed with error state (this may not indicate a failure for all files)", err))
         .finally(() => sftp.end());
 });
